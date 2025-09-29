@@ -1,11 +1,28 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:: Check if we're in a Flutter project
+if not exist "pubspec.yaml" (
+    echo [WARNING] This doesn't appear to be a Flutter project directory.
+    echo [WARNING] pubspec.yaml not found in current directory.
+    echo [INFO] Current directory: %CD%
+    echo.
+    call :ask_confirmation "Continue with cleanup anyway? (This will clean common development files)"
+    if %ERRORLEVEL% NEQ 0 (
+        echo [INFO] Cleanup cancelled by user.
+        pause
+        exit /b 1
+    )
+    echo.
+)
+
 :: Flutter/Gradle Space Cleanup Script for Windows
 :: This script safely removes cache files and build artifacts to free up disk space
 
 echo.
 echo [INFO] Starting Flutter/Gradle cleanup process...
+echo [INFO] This script will clean build caches and temporary files.
+echo [INFO] Missing directories/files are normal and will be skipped.
 echo.
 
 :: Function to safely remove directory
@@ -16,10 +33,10 @@ if exist "%~1" (
     if not exist "%~1" (
         echo [SUCCESS] Removed %~1
     ) else (
-        echo [WARNING] Failed to remove %~1
+        echo [WARNING] Failed to remove %~1 (may be in use)
     )
 ) else (
-    echo [WARNING] Directory %~1 does not exist, skipping
+    echo [INFO] Directory %~1 not found, skipping
 )
 goto :eof
 
@@ -31,10 +48,10 @@ if exist "%~1" (
     if not exist "%~1" (
         echo [SUCCESS] Removed %~1
     ) else (
-        echo [WARNING] Failed to remove %~1
+        echo [WARNING] Failed to remove %~1 (may be in use)
     )
 ) else (
-    echo [WARNING] File %~1 does not exist, skipping
+    echo [INFO] File %~1 not found, skipping
 )
 goto :eof
 
